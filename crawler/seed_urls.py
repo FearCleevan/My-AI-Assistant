@@ -169,6 +169,56 @@ TOPIC_SEEDS = {
         "https://realpython.com/python-basics/",
     ],
 
+    "php": [
+        "https://www.php.net/manual/en/getting-started.php",
+        "https://www.php.net/manual/en/language.types.php",
+        "https://www.php.net/manual/en/language.oop5.php",
+        "https://www.php.net/manual/en/language.namespaces.php",
+        "https://www.php.net/manual/en/language.exceptions.php",
+        "https://www.php.net/manual/en/language.generators.php",
+        "https://www.php.net/manual/en/language.fibers.php",
+        "https://www.php.net/manual/en/refs.basic.vartype.php",
+        "https://www.php.net/manual/en/refs.database.php",
+        "https://www.php.net/manual/en/refs.fileprocess.file.php",
+        "https://www.php.net/manual/en/security.php",
+        "https://www.php.net/manual/en/book.pdo.php",
+        "https://www.php-fig.org/psr/",
+        "https://getcomposer.org/doc/",
+        "https://phptherightway.com/",
+    ],
+
+    "laravel": [
+        "https://laravel.com/docs/11.x",
+        "https://laravel.com/docs/11.x/installation",
+        "https://laravel.com/docs/11.x/routing",
+        "https://laravel.com/docs/11.x/middleware",
+        "https://laravel.com/docs/11.x/controllers",
+        "https://laravel.com/docs/11.x/requests",
+        "https://laravel.com/docs/11.x/responses",
+        "https://laravel.com/docs/11.x/views",
+        "https://laravel.com/docs/11.x/blade",
+        "https://laravel.com/docs/11.x/eloquent",
+        "https://laravel.com/docs/11.x/eloquent-relationships",
+        "https://laravel.com/docs/11.x/eloquent-collections",
+        "https://laravel.com/docs/11.x/migrations",
+        "https://laravel.com/docs/11.x/seeding",
+        "https://laravel.com/docs/11.x/queries",
+        "https://laravel.com/docs/11.x/authentication",
+        "https://laravel.com/docs/11.x/authorization",
+        "https://laravel.com/docs/11.x/validation",
+        "https://laravel.com/docs/11.x/queues",
+        "https://laravel.com/docs/11.x/events",
+        "https://laravel.com/docs/11.x/notifications",
+        "https://laravel.com/docs/11.x/mail",
+        "https://laravel.com/docs/11.x/filesystem",
+        "https://laravel.com/docs/11.x/cache",
+        "https://laravel.com/docs/11.x/session",
+        "https://laravel.com/docs/11.x/testing",
+        "https://laravel.com/docs/11.x/artisan",
+        "https://laravel.com/docs/11.x/deployment",
+        "https://laravel-news.com/",
+    ],
+
     # ── Databases ─────────────────────────────────────────────────────────────
 
     "mongodb": [
@@ -220,6 +270,44 @@ TOPIC_SEEDS = {
         "https://www.prisma.io/docs/orm/prisma-migrate",
         "https://www.prisma.io/docs/orm/overview/databases/postgresql",
         "https://www.prisma.io/docs/orm/overview/databases/mongodb",
+    ],
+
+    "mysql": [
+        "https://dev.mysql.com/doc/refman/8.0/en/introduction.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/sql-statements.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/select.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/insert.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/update.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/delete.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/join.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/create-table.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/alter-table.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/indexes.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/stored-programs-views.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/triggers.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/transactions.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/security.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/optimization.html",
+        "https://dev.mysql.com/doc/refman/8.0/en/replication.html",
+        "https://www.mysqltutorial.org/",
+        "https://www.mysqltutorial.org/mysql-basics/",
+        "https://www.mysqltutorial.org/mysql-stored-procedure/",
+        "https://www.mysqltutorial.org/mysql-administration/",
+    ],
+
+    "sqlite": [
+        "https://www.sqlite.org/docs.html",
+        "https://www.sqlite.org/lang.html",
+        "https://www.sqlite.org/lang_select.html",
+        "https://www.sqlite.org/datatype3.html",
+        "https://www.sqlite.org/indexedexpr.html",
+        "https://www.sqlite.org/fts5.html",
+        "https://www.sqlite.org/json1.html",
+        "https://www.sqlite.org/pragma.html",
+        "https://www.sqlite.org/wal.html",
+        "https://www.sqlite.org/backup.html",
+        "https://www.tutorialspoint.com/sqlite/index.htm",
     ],
 
     # ── Firebase ──────────────────────────────────────────────────────────────
@@ -532,6 +620,315 @@ TOPIC_SEEDS = {
         "https://developer.android.com/kotlin/coroutines",
     ],
 
+    # ── Testing ───────────────────────────────────────────────────────────────
+
+    "testing": [
+        # Jest
+        "https://jestjs.io/docs/getting-started",
+        "https://jestjs.io/docs/configuration",
+        "https://jestjs.io/docs/api",
+        "https://jestjs.io/docs/expect",
+        "https://jestjs.io/docs/mock-functions",
+        "https://jestjs.io/docs/timer-mocks",
+        "https://jestjs.io/docs/snapshot-testing",
+        # Vitest
+        "https://vitest.dev/guide/",
+        "https://vitest.dev/api/",
+        "https://vitest.dev/guide/mocking",
+        "https://vitest.dev/guide/coverage",
+        # React Testing Library
+        "https://testing-library.com/docs/react-testing-library/intro/",
+        "https://testing-library.com/docs/react-testing-library/api",
+        "https://testing-library.com/docs/queries/about",
+        "https://testing-library.com/docs/user-event/intro",
+        # Cypress
+        "https://docs.cypress.io/guides/overview/why-cypress",
+        "https://docs.cypress.io/guides/core-concepts/introduction-to-cypress",
+        "https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test",
+        "https://docs.cypress.io/api/table-of-contents",
+        "https://docs.cypress.io/guides/component-testing/overview",
+        # Playwright
+        "https://playwright.dev/docs/intro",
+        "https://playwright.dev/docs/writing-tests",
+        "https://playwright.dev/docs/api/class-playwright",
+        "https://playwright.dev/docs/test-configuration",
+        "https://playwright.dev/docs/codegen",
+    ],
+
+    "jest": [
+        "https://jestjs.io/docs/getting-started",
+        "https://jestjs.io/docs/configuration",
+        "https://jestjs.io/docs/api",
+        "https://jestjs.io/docs/expect",
+        "https://jestjs.io/docs/mock-functions",
+        "https://jestjs.io/docs/timer-mocks",
+        "https://jestjs.io/docs/snapshot-testing",
+        "https://jestjs.io/docs/asynchronous",
+        "https://jestjs.io/docs/setup-teardown",
+    ],
+
+    "vitest": [
+        "https://vitest.dev/guide/",
+        "https://vitest.dev/api/",
+        "https://vitest.dev/guide/mocking",
+        "https://vitest.dev/guide/coverage",
+        "https://vitest.dev/guide/snapshot",
+        "https://vitest.dev/config/",
+    ],
+
+    "cypress": [
+        "https://docs.cypress.io/guides/overview/why-cypress",
+        "https://docs.cypress.io/guides/core-concepts/introduction-to-cypress",
+        "https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test",
+        "https://docs.cypress.io/api/table-of-contents",
+        "https://docs.cypress.io/guides/component-testing/overview",
+        "https://docs.cypress.io/guides/core-concepts/interacting-with-elements",
+        "https://docs.cypress.io/guides/guides/network-requests",
+    ],
+
+    "playwright": [
+        "https://playwright.dev/docs/intro",
+        "https://playwright.dev/docs/writing-tests",
+        "https://playwright.dev/docs/api/class-playwright",
+        "https://playwright.dev/docs/test-configuration",
+        "https://playwright.dev/docs/codegen",
+        "https://playwright.dev/docs/selectors",
+        "https://playwright.dev/docs/network",
+        "https://playwright.dev/docs/trace-viewer",
+    ],
+
+    # ── Meta-frameworks & Runtimes ────────────────────────────────────────────
+
+    "astro": [
+        "https://docs.astro.build/en/getting-started/",
+        "https://docs.astro.build/en/basics/project-structure/",
+        "https://docs.astro.build/en/basics/astro-pages/",
+        "https://docs.astro.build/en/basics/astro-components/",
+        "https://docs.astro.build/en/basics/layouts/",
+        "https://docs.astro.build/en/guides/routing/",
+        "https://docs.astro.build/en/guides/data-fetching/",
+        "https://docs.astro.build/en/guides/server-side-rendering/",
+        "https://docs.astro.build/en/guides/integrations-guide/",
+        "https://docs.astro.build/en/guides/deploy/",
+        "https://docs.astro.build/en/reference/configuration-reference/",
+    ],
+
+    "remix": [
+        "https://remix.run/docs/en/main",
+        "https://remix.run/docs/en/main/start/quickstart",
+        "https://remix.run/docs/en/main/guides/routing",
+        "https://remix.run/docs/en/main/route/loader",
+        "https://remix.run/docs/en/main/route/action",
+        "https://remix.run/docs/en/main/route/meta",
+        "https://remix.run/docs/en/main/guides/data-loading",
+        "https://remix.run/docs/en/main/guides/form-validation",
+        "https://remix.run/docs/en/main/guides/errors",
+        "https://remix.run/docs/en/main/guides/sessions-and-cookies",
+        "https://remix.run/docs/en/main/guides/deployment",
+    ],
+
+    "hono": [
+        "https://hono.dev/docs/",
+        "https://hono.dev/docs/getting-started/basic",
+        "https://hono.dev/docs/concepts/routers",
+        "https://hono.dev/docs/concepts/middleware",
+        "https://hono.dev/docs/guides/rpc",
+        "https://hono.dev/docs/middleware/builtin/cors",
+        "https://hono.dev/docs/middleware/builtin/jwt",
+        "https://hono.dev/docs/middleware/builtin/zod-validator",
+        "https://hono.dev/docs/getting-started/cloudflare-workers",
+        "https://hono.dev/docs/getting-started/nodejs",
+    ],
+
+    "bun": [
+        "https://bun.sh/docs",
+        "https://bun.sh/docs/installation",
+        "https://bun.sh/docs/runtime/index",
+        "https://bun.sh/docs/api/http",
+        "https://bun.sh/docs/api/websockets",
+        "https://bun.sh/docs/api/file-io",
+        "https://bun.sh/docs/api/sqlite",
+        "https://bun.sh/docs/api/spawn",
+        "https://bun.sh/docs/test/writing",
+        "https://bun.sh/docs/bundler",
+        "https://bun.sh/docs/package-manager",
+    ],
+
+    "deno": [
+        "https://docs.deno.com/runtime/",
+        "https://docs.deno.com/runtime/fundamentals/",
+        "https://docs.deno.com/runtime/fundamentals/modules/",
+        "https://docs.deno.com/runtime/fundamentals/security/",
+        "https://docs.deno.com/runtime/fundamentals/typescript/",
+        "https://docs.deno.com/runtime/fundamentals/testing/",
+        "https://docs.deno.com/runtime/fundamentals/http_server/",
+        "https://docs.deno.com/deploy/manual/",
+        "https://jsr.io/docs",
+    ],
+
+    # ── Auth & Payments ───────────────────────────────────────────────────────
+
+    "nextauth": [
+        "https://authjs.dev/getting-started",
+        "https://authjs.dev/getting-started/installation",
+        "https://authjs.dev/guides/",
+        "https://authjs.dev/reference/nextjs",
+        "https://authjs.dev/reference/core",
+        "https://authjs.dev/getting-started/authentication/oauth",
+        "https://authjs.dev/getting-started/authentication/credentials",
+        "https://authjs.dev/getting-started/adapters",
+        "https://authjs.dev/getting-started/database",
+    ],
+
+    "stripe": [
+        "https://stripe.com/docs",
+        "https://stripe.com/docs/development",
+        "https://stripe.com/docs/api",
+        "https://stripe.com/docs/payments/accept-a-payment",
+        "https://stripe.com/docs/payments/payment-intents",
+        "https://stripe.com/docs/payments/checkout",
+        "https://stripe.com/docs/billing/subscriptions/overview",
+        "https://stripe.com/docs/billing/subscriptions/build-subscriptions",
+        "https://stripe.com/docs/webhooks",
+        "https://stripe.com/docs/connect",
+        "https://stripe.com/docs/testing",
+        "https://stripe.com/docs/stripe-js",
+        "https://stripe.com/docs/payments/no-code",
+    ],
+
+    # ── Validation & Forms ────────────────────────────────────────────────────
+
+    "zod": [
+        "https://zod.dev/",
+        "https://zod.dev/?id=basic-usage",
+        "https://zod.dev/?id=primitives",
+        "https://zod.dev/?id=objects",
+        "https://zod.dev/?id=arrays",
+        "https://zod.dev/?id=unions",
+        "https://zod.dev/?id=intersections",
+        "https://zod.dev/?id=recursive-types",
+        "https://zod.dev/?id=error-handling",
+        "https://zod.dev/?id=transform",
+    ],
+
+    "react hook form": [
+        "https://react-hook-form.com/get-started",
+        "https://react-hook-form.com/docs/useform",
+        "https://react-hook-form.com/docs/usecontroller",
+        "https://react-hook-form.com/docs/usefieldarray",
+        "https://react-hook-form.com/docs/usewatch",
+        "https://react-hook-form.com/docs/useformstate",
+        "https://react-hook-form.com/get-started#SchemaValidation",
+        "https://react-hook-form.com/advanced-usage",
+    ],
+
+    # ── UI Libraries ──────────────────────────────────────────────────────────
+
+    "shadcn": [
+        "https://ui.shadcn.com/docs",
+        "https://ui.shadcn.com/docs/installation",
+        "https://ui.shadcn.com/docs/components/button",
+        "https://ui.shadcn.com/docs/components/card",
+        "https://ui.shadcn.com/docs/components/dialog",
+        "https://ui.shadcn.com/docs/components/form",
+        "https://ui.shadcn.com/docs/components/input",
+        "https://ui.shadcn.com/docs/components/select",
+        "https://ui.shadcn.com/docs/components/table",
+        "https://ui.shadcn.com/docs/components/toast",
+        "https://ui.shadcn.com/docs/theming",
+        "https://ui.shadcn.com/docs/dark-mode/next",
+    ],
+
+    "radix ui": [
+        "https://www.radix-ui.com/primitives/docs/overview/introduction",
+        "https://www.radix-ui.com/primitives/docs/overview/getting-started",
+        "https://www.radix-ui.com/primitives/docs/guides/styling",
+        "https://www.radix-ui.com/primitives/docs/guides/animation",
+        "https://www.radix-ui.com/primitives/docs/guides/accessibility",
+        "https://www.radix-ui.com/themes/docs/overview/getting-started",
+    ],
+
+    # ── 3D & Graphics ─────────────────────────────────────────────────────────
+
+    "threejs": [
+        "https://threejs.org/docs/",
+        "https://threejs.org/docs/#manual/en/introduction/Creating-a-scene",
+        "https://threejs.org/docs/#api/en/cameras/PerspectiveCamera",
+        "https://threejs.org/docs/#api/en/core/BufferGeometry",
+        "https://threejs.org/docs/#api/en/materials/MeshStandardMaterial",
+        "https://threejs.org/docs/#api/en/lights/DirectionalLight",
+        "https://threejs.org/docs/#api/en/loaders/TextureLoader",
+        "https://threejs.org/docs/#api/en/animation/AnimationMixer",
+        "https://threejs.org/examples/",
+        "https://r3f.docs.pmnd.rs/getting-started/introduction",
+    ],
+
+    # ── Desktop Apps ──────────────────────────────────────────────────────────
+
+    "electron": [
+        "https://www.electronjs.org/docs/latest/",
+        "https://www.electronjs.org/docs/latest/tutorial/quick-start",
+        "https://www.electronjs.org/docs/latest/tutorial/process-model",
+        "https://www.electronjs.org/docs/latest/api/app",
+        "https://www.electronjs.org/docs/latest/api/browser-window",
+        "https://www.electronjs.org/docs/latest/api/ipc-main",
+        "https://www.electronjs.org/docs/latest/api/ipc-renderer",
+        "https://www.electronjs.org/docs/latest/tutorial/ipc",
+        "https://www.electronjs.org/docs/latest/tutorial/security",
+        "https://www.electronjs.org/docs/latest/tutorial/packaging",
+    ],
+
+    # ── Git & CLI Tools ───────────────────────────────────────────────────────
+
+    "git": [
+        "https://git-scm.com/doc",
+        "https://git-scm.com/book/en/v2",
+        "https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control",
+        "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
+        "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+        "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+        "https://git-scm.com/book/en/v2/Distributed-Git-Distributed-Workflows",
+        "https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project",
+        "https://git-scm.com/docs/git",
+        "https://www.atlassian.com/git/tutorials/what-is-version-control",
+        "https://www.atlassian.com/git/tutorials/using-branches",
+        "https://www.atlassian.com/git/tutorials/merging-vs-rebasing",
+        "https://learngitbranching.js.org/",
+        "https://ohshitgit.com/",
+    ],
+
+    # ── Linux & Shell ─────────────────────────────────────────────────────────
+
+    "linux": [
+        "https://linuxcommand.org/lc3_learning_the_shell.php",
+        "https://linuxcommand.org/lc3_writing_shell_scripts.php",
+        "https://www.gnu.org/software/bash/manual/bash.html",
+        "https://tldp.org/LDP/Bash-Beginners-Guide/html/",
+        "https://tldp.org/LDP/abs/html/",
+        "https://linux.die.net/man/",
+        "https://www.man7.org/linux/man-pages/",
+        "https://www.digitalocean.com/community/tutorial-series/getting-started-with-linux",
+        "https://ubuntu.com/tutorials",
+        "https://www.cyberciti.biz/faq/",
+        "https://ss64.com/bash/",
+        "https://tldr.sh/",
+    ],
+
+    # ── Edge & CDN ────────────────────────────────────────────────────────────
+
+    "cloudflare": [
+        "https://developers.cloudflare.com/workers/",
+        "https://developers.cloudflare.com/workers/get-started/guide/",
+        "https://developers.cloudflare.com/workers/runtime-apis/",
+        "https://developers.cloudflare.com/kv/",
+        "https://developers.cloudflare.com/durable-objects/",
+        "https://developers.cloudflare.com/r2/",
+        "https://developers.cloudflare.com/d1/",
+        "https://developers.cloudflare.com/pages/",
+        "https://developers.cloudflare.com/ai-gateway/",
+        "https://developers.cloudflare.com/fundamentals/",
+    ],
+
     # ── State Management ──────────────────────────────────────────────────────
 
     "redux": [
@@ -658,6 +1055,123 @@ _ALIASES = {
     "jetpack compose":       "android",
     "android jetpack":       "android",
     "compose":               "android",
+
+    # MySQL / SQLite
+    "mysql database":        "mysql",
+    "my sql":                "mysql",
+    "mariadb":               "mysql",
+    "maria db":              "mysql",
+    "sql":                   "mysql",
+    "sqlite3":               "sqlite",
+    "sqlite database":       "sqlite",
+
+    # PHP / Laravel
+    "php language":          "php",
+    "php8":                  "php",
+    "php 8":                 "php",
+    "composer":              "php",
+    "laravel framework":     "laravel",
+    "laravel 11":            "laravel",
+    "laravel 10":            "laravel",
+    "eloquent":              "laravel",
+    "artisan":               "laravel",
+    "blade":                 "laravel",
+    "lumen":                 "laravel",
+    "inertia":               "laravel",
+    "livewire":              "laravel",
+
+    # Testing
+    "unit testing":          "testing",
+    "e2e testing":           "testing",
+    "end to end testing":    "testing",
+    "integration testing":   "testing",
+    "test driven":           "testing",
+    "tdd":                   "testing",
+    "jest testing":          "jest",
+    "vitest testing":        "vitest",
+    "cypress testing":       "cypress",
+    "playwright testing":    "playwright",
+    "testing library":       "testing",
+    "react testing":         "testing",
+
+    # Meta-frameworks & Runtimes
+    "astro js":              "astro",
+    "astro.js":              "astro",
+    "remix run":             "remix",
+    "remix js":              "remix",
+    "hono js":               "hono",
+    "hono framework":        "hono",
+    "bun js":                "bun",
+    "bun runtime":           "bun",
+    "deno js":               "deno",
+    "deno runtime":          "deno",
+    "deno 2":                "deno",
+
+    # Auth
+    "auth.js":               "nextauth",
+    "next auth":             "nextauth",
+    "next-auth":             "nextauth",
+    "authjs":                "nextauth",
+    "authentication":        "nextauth",
+
+    # Payments
+    "stripe payments":       "stripe",
+    "stripe api":            "stripe",
+    "stripe checkout":       "stripe",
+    "stripe subscription":   "stripe",
+    "payment gateway":       "stripe",
+
+    # Validation & Forms
+    "zod validation":        "zod",
+    "zod schema":            "zod",
+    "rhf":                   "react hook form",
+    "react form":            "react hook form",
+    "hook form":             "react hook form",
+    "form validation":       "react hook form",
+
+    # UI
+    "shadcn ui":             "shadcn",
+    "shadcn/ui":             "shadcn",
+    "shadcn components":     "shadcn",
+    "radix":                 "radix ui",
+    "radix primitives":      "radix ui",
+
+    # 3D
+    "three.js":              "threejs",
+    "three js":              "threejs",
+    "webgl":                 "threejs",
+    "react three fiber":     "threejs",
+    "r3f":                   "threejs",
+
+    # Desktop
+    "electron js":           "electron",
+    "electron app":          "electron",
+    "desktop app":           "electron",
+
+    # Git
+    "github":                "git",
+    "version control":       "git",
+    "git commands":          "git",
+    "git workflow":          "git",
+
+    # Linux
+    "bash":                  "linux",
+    "shell":                 "linux",
+    "bash scripting":        "linux",
+    "shell scripting":       "linux",
+    "terminal":              "linux",
+    "ubuntu":                "linux",
+    "debian":                "linux",
+    "unix":                  "linux",
+    "command line":          "linux",
+
+    # Cloudflare
+    "cloudflare workers":    "cloudflare",
+    "cf workers":            "cloudflare",
+    "cloudflare pages":      "cloudflare",
+    "cloudflare r2":         "cloudflare",
+    "cloudflare d1":         "cloudflare",
+    "wrangler":              "cloudflare",
 }
 
 
