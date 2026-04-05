@@ -1,0 +1,130 @@
+{
+  "name": "myai-assistant",
+  "displayName": "My AI Assistant",
+  "description": "Your personal local AI assistant — powered by Ollama and your own knowledge base",
+  "version": "1.1.0",
+  "publisher": "fearcleevan",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["AI", "Chat", "Other"],
+  "icon": "icon.png",
+  "activationEvents": [],
+  "main": "./out/extension.js",
+
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "myai-sidebar",
+          "title": "My AI Assistant",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+
+    "views": {
+      "myai-sidebar": [
+        {
+          "type": "webview",
+          "id": "myai.chatView",
+          "name": "My AI Assistant"
+        }
+      ]
+    },
+
+    "commands": [
+      {
+        "command": "myai.openChat",
+        "title": "My AI: Open Chat",
+        "category": "My AI"
+      },
+      {
+        "command": "myai.explainSelection",
+        "title": "My AI: Explain this",
+        "category": "My AI"
+      },
+      {
+        "command": "myai.fixSelection",
+        "title": "My AI: Fix this",
+        "category": "My AI"
+      },
+      {
+        "command": "myai.generateTests",
+        "title": "My AI: Generate tests",
+        "category": "My AI"
+      },
+      {
+        "command": "myai.refactorSelection",
+        "title": "My AI: Refactor this",
+        "category": "My AI"
+      },
+      {
+        "command": "myai.askAboutFile",
+        "title": "My AI: Ask about this file",
+        "category": "My AI"
+      }
+    ],
+
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "myai.submenu",
+          "group": "myai@1"
+        }
+      ],
+      "myai.submenu": [
+        { "command": "myai.explainSelection",  "group": "1_ask@1" },
+        { "command": "myai.fixSelection",      "group": "1_ask@2" },
+        { "command": "myai.generateTests",     "group": "1_ask@3" },
+        { "command": "myai.refactorSelection", "group": "1_ask@4" },
+        { "command": "myai.askAboutFile",      "group": "2_file@1" }
+      ],
+      "explorer/context": [
+        { "command": "myai.askAboutFile", "group": "myai@1" }
+      ]
+    },
+
+    "submenus": [
+      {
+        "id": "myai.submenu",
+        "label": "My AI Assistant"
+      }
+    ],
+
+    "keybindings": [
+      {
+        "command": "myai.openChat",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      }
+    ],
+
+    "configuration": {
+      "title": "My AI Assistant",
+      "properties": {
+        "myai.serverPort": {
+          "type": "number",
+          "default": 8765,
+          "description": "Port where `myai serve` is running"
+        },
+        "myai.defaultTopic": {
+          "type": "string",
+          "default": "",
+          "description": "Default knowledge-base topic (leave blank to auto-detect from project)"
+        }
+      }
+    }
+  },
+
+  "scripts": {
+    "compile":   "tsc -p ./",
+    "watch":     "tsc -watch -p ./",
+    "package":   "npm run compile && vsce package --no-dependencies"
+  },
+
+  "devDependencies": {
+    "@types/node":   "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript":    "^5.3.0",
+    "@vscode/vsce":  "^3.2.0"
+  }
+}

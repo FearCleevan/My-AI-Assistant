@@ -1,0 +1,13 @@
+requests
+beautifulsoup4
+lxml
+sentence-transformers
+chromadb
+tqdm
+PyQt6
+schedule
+pypdf
+pygments
+pathspec
+fastapi
+uvicorn[standard]

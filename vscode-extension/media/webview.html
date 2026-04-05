@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+<title>My AI Assistant</title>
+<style>
+/* Reset & VS Code theme vars */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--vscode-font-family, 'Segoe UI', Arial, sans-serif);
+  font-size:   var(--vscode-font-size, 13px);
+  background:  var(--vscode-editor-background, #1e1e2e);
+  color:       var(--vscode-editor-foreground, #cdd6f4);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Status bar */
+#status-bar {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--vscode-panel-border, #313244);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  flex-shrink: 0;
+}
+#status-dot { width:8px; height:8px; border-radius:50%; background:#f38ba8; flex-shrink:0; }
+#status-dot.ok { background:#a6e3a1; }
+#status-text { color: var(--vscode-descriptionForeground, #6c7086); flex:1; }
+
+/* Topic / file bar */
+#context-bar {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--vscode-panel-border, #313244);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 26px;
+}
+#topic-input {
+  flex: 1;
+  background: var(--vscode-input-background, #313244);
+  border: 1px solid var(--vscode-input-border, #45475a);
+  color: var(--vscode-input-foreground, #cdd6f4);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: inherit;
+}
+#file-badge {
+  color: var(--vscode-descriptionForeground, #6c7086);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+/* Chat messages */
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#chat::-webkit-scrollbar { width: 6px; }
+#chat::-webkit-scrollbar-thumb { background: #45475a; border-radius:3px; }
+
+.msg { display:flex; flex-direction:column; gap:4px; }
+
+.msg-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.msg-label.user { color: #89b4fa; }
+.msg-label.ai   { color: #a6e3a1; }
+
+.msg-bubble {
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg-bubble.user {
+  background: #1e2a3a;
+  border-left: 3px solid #89b4fa;
+  color: #cdd6f4;
+}
+.msg-bubble.ai {
+  background: transparent;
+  color: #cdd6f4;
+}
+
+/* Code blocks */
+.code-block {
+  margin: 8px 0;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  background: #1e1e38;
+  font-size: 11px;
+  font-family: Consolas, monospace;
+}
+.code-lang { color: #6c7086; }
+.code-copy {
+  color: #89b4fa;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 11px;
+  font-family: inherit;
+  padding: 0;
+  text-decoration: none;
+}
+.code-copy:hover { text-decoration: underline; }
+.code-body {
+  background: #12121f;
+  padding: 12px 14px;
+  overflow-x: auto;
+}
+.code-body pre {
+  margin: 0;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #f8f8f2;
+  white-space: pre;
+}
+
+/* Sources */
+.sources {
+  font-size: 11px;
+  color: #6c7086;
+  margin-top: 4px;
+  padding: 4px 0;
+}
+.sources a { color: #89b4fa; text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+
+/* Typing cursor */
+.cursor::after {
+  content: '\25ae';
+  animation: blink 0.7s step-end infinite;
+  color: #a6e3a1;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Input area */
+#input-area {
+  border-top: 1px solid var(--vscode-panel-border, #313244);
+  padding: 8px 10px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+#user-input {
+  flex: 1;
+  background: var(--vscode-input-background, #313244);
+  border: 1px solid var(--vscode-input-border, #45475a);
+  color: var(--vscode-input-foreground, #cdd6f4);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: none;
+  min-height: 36px;
+  max-height: 120px;
+  line-height: 1.4;
+  outline: none;
+}
+#user-input:focus { border-color: var(--vscode-focusBorder, #89b4fa); }
+#send-btn {
+  background: var(--vscode-button-background, #89b4fa);
+  color: var(--vscode-button-foreground, #1e1e2e);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+  align-self: flex-end;
+  height: 36px;
+}
+#send-btn:hover   { opacity: 0.9; }
+#send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+#clear-btn {
+  background: none;
+  border: 1px solid #45475a;
+  color: #6c7086;
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  align-self: flex-end;
+  height: 36px;
+}
+#clear-btn:hover { border-color: #89b4fa; color: #cdd6f4; }
+</style>
+</head>
+<body>
+
+<!-- Status bar -->
+<div id="status-bar">
+  <div id="status-dot"></div>
+  <span id="status-text">Connecting to My AI server&#8230;</span>
+</div>
+
+<!-- Topic / file context bar -->
+<div id="context-bar">
+  <span style="color:#6c7086;font-size:11px;">Topic:</span>
+  <input id="topic-input" placeholder="react, project:my-app, ...  (blank = general)" />
+  <span id="file-badge">no file open</span>
+</div>
+
+<!-- Chat history -->
+<div id="chat"></div>
+
+<!-- Input -->
+<div id="input-area">
+  <textarea id="user-input" rows="1"
+    placeholder="Ask anything... (Ctrl+Enter to send)"></textarea>
+  <button id="clear-btn" title="Clear conversation">Clear</button>
+  <button id="send-btn">Send</button>
+</div>
+
+<script>
+// VS Code API
+const vscode = acquireVsCodeApi();
+
+// DOM refs
+const chatEl       = document.getElementById('chat');
+const inputEl      = document.getElementById('user-input');
+const sendBtn      = document.getElementById('send-btn');
+const clearBtn     = document.getElementById('clear-btn');
+const topicInput   = document.getElementById('topic-input');
+const fileBadge    = document.getElementById('file-badge');
+const statusDot    = document.getElementById('status-dot');
+const statusText   = document.getElementById('status-text');
+
+let currentAiBubble  = null;
+let streamingRawText = '';
+
+// Helpers
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Parse triple-backtick code fences into styled HTML.
+// BT3 is built dynamically to avoid any tooling conflicts with fence characters.
+function renderMarkdown(text) {
+  var BT3   = String.fromCharCode(96, 96, 96);
+  var parts = [];
+  var pos   = 0;
+
+  while (pos < text.length) {
+    var start = text.indexOf(BT3, pos);
+    if (start === -1) { break; }
+
+    if (start > pos) {
+      parts.push('<span>' + escHtml(text.slice(pos, start)) + '</span>');
+    }
+
+    var nlPos    = text.indexOf('\n', start + 3);
+    var lang     = nlPos === -1 ? '' : text.slice(start + 3, nlPos).trim();
+    var codeStart = nlPos === -1 ? start + 3 : nlPos + 1;
+
+    var end = text.indexOf(BT3, codeStart);
+    if (end === -1) { break; }
+
+    var code    = text.slice(codeStart, end);
+    var blockId = 'cb_' + Math.random().toString(36).slice(2);
+
+    parts.push(
+      '<div class="code-block">' +
+        '<div class="code-header">' +
+          '<span class="code-lang">' + escHtml(lang) + '</span>' +
+          '<button class="code-copy" onclick="copyCode(\'' + blockId + '\')">&#128203; Copy code</button>' +
+        '</div>' +
+        '<div class="code-body"><pre id="' + blockId + '">' + escHtml(code) + '</pre></div>' +
+      '</div>'
+    );
+
+    pos = end + 3;
+  }
+
+  if (pos < text.length) {
+    parts.push('<span>' + escHtml(text.slice(pos)) + '</span>');
+  }
+  return parts.join('');
+}
+
+function copyCode(blockId) {
+  var el = document.getElementById(blockId);
+  if (!el) { return; }
+  navigator.clipboard.writeText(el.textContent || '').then(function() {
+    statusText.textContent = 'Code copied to clipboard!';
+    setTimeout(function() { statusText.textContent = 'Connected'; }, 2000);
+  });
+}
+
+function scrollBottom() {
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// Append messages
+
+function appendUserMsg(text) {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'msg';
+  wrapper.innerHTML =
+    '<div class="msg-label user">You</div>' +
+    '<div class="msg-bubble user">' + escHtml(text) + '</div>';
+  chatEl.appendChild(wrapper);
+  scrollBottom();
+}
+
+function startAiMsg() {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'msg';
+  wrapper.innerHTML = '<div class="msg-label ai">AI</div>';
+  var bubble = document.createElement('div');
+  bubble.className = 'msg-bubble ai cursor';
+  wrapper.appendChild(bubble);
+  chatEl.appendChild(wrapper);
+  currentAiBubble  = bubble;
+  streamingRawText = '';
+  scrollBottom();
+}
+
+function appendToken(token) {
+  if (!currentAiBubble) { return; }
+  streamingRawText += token;
+  currentAiBubble.textContent = streamingRawText;
+  scrollBottom();
+}
+
+function finalizeAiMsg(sources) {
+  if (!currentAiBubble) { return; }
+  currentAiBubble.classList.remove('cursor');
+  currentAiBubble.innerHTML = renderMarkdown(streamingRawText);
+  if (sources && sources.length) {
+    var src = document.createElement('div');
+    src.className = 'sources';
+    src.innerHTML = 'Sources: ' + sources.map(function(s) {
+      return '[' + s.num + '] <a href="' + escHtml(s.url) + '" target="_blank">' + escHtml(s.title) + '</a>';
+    }).join('  &middot;  ');
+    currentAiBubble.parentElement.appendChild(src);
+  }
+  currentAiBubble = null;
+  streamingRawText = '';
+  scrollBottom();
+}
+
+function appendErrorMsg(msg) {
+  if (currentAiBubble) {
+    currentAiBubble.classList.remove('cursor');
+    currentAiBubble.style.color = '#f38ba8';
+    currentAiBubble.textContent = 'Error: ' + msg;
+    currentAiBubble = null;
+  }
+  sendBtn.disabled = false;
+}
+
+// Send
+
+function sendMessage() {
+  var text = inputEl.value.trim();
+  if (!text) { return; }
+  inputEl.value = '';
+  inputEl.style.height = '';
+  sendBtn.disabled = true;
+
+  appendUserMsg(text);
+  vscode.postMessage({ type: 'chat', question: text });
+}
+
+sendBtn.addEventListener('click', sendMessage);
+
+inputEl.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.ctrlKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+inputEl.addEventListener('input', function() {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+});
+
+clearBtn.addEventListener('click', function() {
+  chatEl.innerHTML = '';
+  vscode.postMessage({ type: 'clear' });
+});
+
+topicInput.addEventListener('change', function() {
+  vscode.postMessage({ type: 'setTopic', topic: topicInput.value.trim() });
+});
+
+// Messages from extension
+
+window.addEventListener('message', function(event) {
+  var msg = event.data;
+  switch (msg.type) {
+
+    case 'serverStatus':
+      statusDot.className  = 'status-dot' + (msg.ok ? ' ok' : '');
+      statusText.textContent = msg.message;
+      break;
+
+    case 'fileContext':
+      fileBadge.textContent = msg.fileName
+        ? msg.fileName + '  (' + (msg.chars / 1000).toFixed(1) + 'k chars)'
+        : 'no file open';
+      break;
+
+    case 'setTopic':
+      topicInput.value = msg.topic;
+      if (msg.message) {
+        statusText.textContent = msg.message;
+      }
+      break;
+
+    case 'setInput':
+      inputEl.value = msg.value;
+      inputEl.focus();
+      inputEl.style.height = 'auto';
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+      break;
+
+    case 'startResponse':
+      startAiMsg();
+      break;
+
+    case 'token':
+      appendToken(msg.token);
+      break;
+
+    case 'done':
+      finalizeAiMsg(msg.sources);
+      sendBtn.disabled = false;
+      break;
+
+    case 'error':
+      appendErrorMsg(msg.message);
+      break;
+  }
+});
+
+// Init
+vscode.postMessage({ type: 'ready' });
+inputEl.focus();
+</script>
+</body>
+</html>

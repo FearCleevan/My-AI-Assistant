@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="64" fill="#1e1e2e"/>
+
+  <!-- Outer ring accent -->
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#313244" stroke-width="2"/>
+
+  <!-- Brain / circuit top-left -->
+  <circle cx="34" cy="38" r="6" fill="none" stroke="#89b4fa" stroke-width="2"/>
+  <circle cx="54" cy="28" r="6" fill="none" stroke="#89b4fa" stroke-width="2"/>
+  <circle cx="74" cy="28" r="6" fill="none" stroke="#cba6f7" stroke-width="2"/>
+  <circle cx="94" cy="38" r="6" fill="none" stroke="#cba6f7" stroke-width="2"/>
+
+  <!-- Circuit lines top -->
+  <line x1="40" y1="38" x2="48" y2="31" stroke="#89b4fa" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="60" y1="28" x2="68" y2="28" stroke="#89b4fa" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="80" y1="31" x2="88" y2="38" stroke="#cba6f7" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Vertical lines down to chat bubble -->
+  <line x1="34" y1="44" x2="34" y2="52" stroke="#89b4fa" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="54" y1="34" x2="54" y2="52" stroke="#89b4fa" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="74" y1="34" x2="74" y2="52" stroke="#cba6f7" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="94" y1="44" x2="94" y2="52" stroke="#cba6f7" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Chat bubble body -->
+  <rect x="22" y="52" width="84" height="48" rx="10" ry="10" fill="#313244"/>
+  <rect x="22" y="52" width="84" height="48" rx="10" ry="10" fill="none" stroke="#45475a" stroke-width="1.5"/>
+
+  <!-- Chat bubble tail -->
+  <polygon points="38,100 28,116 52,100" fill="#313244"/>
+  <line x1="28" y1="116" x2="38" y2="100" stroke="#45475a" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Typing dots inside bubble -->
+  <circle cx="46" cy="76" r="5" fill="#89b4fa"/>
+  <circle cx="64" cy="76" r="5" fill="#a6e3a1"/>
+  <circle cx="82" cy="76" r="5" fill="#cba6f7"/>
+
+  <!-- Shine highlight -->
+  <ellipse cx="45" cy="42" rx="18" ry="6" fill="white" opacity="0.04" transform="rotate(-30 45 42)"/>
+</svg>
