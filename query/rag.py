@@ -143,7 +143,18 @@ class RAGEngine:
 
         # Attached file context
         if file_context.strip():
-            parts.append("=== ATTACHED FILE ===\n" + file_context.strip() + "\n=== END ATTACHED FILE ===\n")
+            parts.append(
+                "=== ATTACHED FILE ===\n" + file_context.strip() + "\n=== END ATTACHED FILE ===\n\n"
+                "FILE OPERATION RULES: When your response requires creating or modifying a file, "
+                "output the COMPLETE file content wrapped in exactly this format:\n"
+                "<file_write path=\"relative/path/to/file.ext\">\n"
+                "... complete file content ...\n"
+                "</file_write>\n"
+                "Rules: (1) path must be relative to the workspace root, "
+                "(2) always include the FULL file content — never partial, "
+                "(3) you may include multiple <file_write> blocks if several files need changes, "
+                "(4) only use this format when actually writing or creating a file."
+            )
 
         # Conversation history
         if history:

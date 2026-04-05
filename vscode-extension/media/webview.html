@@ -246,6 +246,77 @@ body {
 #at-hint { padding:0 10px 5px; font-size:10px; color:#45475a; }
 .at-key      { color:#89b4fa; }
 .topic-label { color:#6c7086; font-size:11px; }
+
+/* ── File proposal cards (Phase 6) ─────────────────────────────────────── */
+.file-proposal {
+  margin: 10px 0 4px;
+  border: 1px solid #6363a0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a2e;
+}
+.proposal-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: #252540;
+  border-bottom: 1px solid #45475a;
+  font-size: 12px;
+}
+.proposal-icon  { font-size:14px; flex-shrink:0; }
+.proposal-path  { color:#cba6f7; font-family:Consolas,monospace; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.proposal-badge {
+  font-size:10px; font-weight:700; letter-spacing:.5px;
+  padding:1px 6px; border-radius:10px; flex-shrink:0;
+}
+.proposal-badge.new  { background:#a6e3a120; color:#a6e3a1; border:1px solid #a6e3a155; }
+.proposal-badge.edit { background:#89b4fa20; color:#89b4fa; border:1px solid #89b4fa55; }
+
+.proposal-preview {
+  margin:0; padding:10px 14px;
+  font-family:Consolas,'Courier New',monospace;
+  font-size:11px; line-height:1.5; color:#cdd6f4;
+  background:#12121f; overflow-x:auto;
+  max-height:180px; overflow-y:auto;
+  border-bottom:1px solid #313244;
+  white-space:pre;
+}
+.proposal-preview::-webkit-scrollbar { width:4px; height:4px; }
+.proposal-preview::-webkit-scrollbar-thumb { background:#45475a; border-radius:2px; }
+
+.proposal-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #1e1e38;
+}
+.btn-accept {
+  background:#a6e3a1; color:#1e1e2e; border:none; border-radius:4px;
+  padding:4px 14px; font-size:12px; font-weight:700; cursor:pointer;
+}
+.btn-accept:hover { opacity:.85; }
+.btn-accept:disabled { opacity:.4; cursor:not-allowed; }
+.btn-diff {
+  background:transparent; color:#89b4fa;
+  border:1px solid #89b4fa55; border-radius:4px;
+  padding:4px 12px; font-size:12px; cursor:pointer;
+}
+.btn-diff:hover { background:#89b4fa18; }
+.btn-reject {
+  background:transparent; color:#f38ba8;
+  border:1px solid #f38ba855; border-radius:4px;
+  padding:4px 12px; font-size:12px; cursor:pointer;
+  margin-left:auto;
+}
+.btn-reject:hover { background:#f38ba818; }
+.proposal-status {
+  font-size:11px; padding:4px 12px 6px;
+  display:flex; align-items:center; gap:5px;
+}
+.proposal-status.accepted { color:#a6e3a1; }
+.proposal-status.rejected { color:#6c7086; }
+.proposal-status.error    { color:#f38ba8; }
 </style>
 </head>
 <body>
@@ -508,6 +579,104 @@ inputEl.addEventListener('input', function() {
   inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
 });
 
+// ── Phase 6: File proposal storage & rendering ───────────────────────────────
+
+var proposalContents = {};   // id -> content string
+
+function extractProposals(rawText) {
+  var proposals   = [];
+  var cleanedText = rawText;
+  // Match <file_write path="...">...</file_write>  (greedy-free)
+  var re = /<file_write\s+path="([^"]+)">([\s\S]*?)<\/file_write>/g;
+  var match;
+  var replaced = [];
+  while ((match = re.exec(rawText)) !== null) {
+    var id      = 'fp_' + Math.random().toString(36).slice(2, 9);
+    var fpath   = match[1];
+    var content = match[2].replace(/^\n/, '').replace(/\n$/, '');
+    proposals.push({ id: id, path: fpath, content: content });
+    replaced.push({ orig: match[0], id: id });
+  }
+  for (var i = 0; i < replaced.length; i++) {
+    cleanedText = cleanedText.replace(replaced[i].orig, '\n[[PROPOSAL:' + replaced[i].id + ']]\n');
+  }
+  return { proposals: proposals, cleanedText: cleanedText };
+}
+
+function renderProposalCard(id, filePath, content, isNew) {
+  var ext      = filePath.split('.').pop() || '';
+  var lines    = content.split('\n');
+  var preview  = lines.slice(0, 15).join('\n') + (lines.length > 15 ? '\n...' : '');
+  var badge    = isNew ? '<span class="proposal-badge new">NEW FILE</span>'
+                       : '<span class="proposal-badge edit">EDIT</span>';
+  return (
+    '<div class="file-proposal" id="proposal-' + id + '">' +
+      '<div class="proposal-header">' +
+        '<span class="proposal-icon">' + fileIcon(ext) + '</span>' +
+        '<span class="proposal-path">' + escHtml(filePath) + '</span>' +
+        badge +
+      '</div>' +
+      '<pre class="proposal-preview">' + escHtml(preview) + '</pre>' +
+      '<div class="proposal-actions">' +
+        '<button type="button" class="btn-accept" onclick="acceptProposal(\'' + id + '\')">' +
+          '&#10003; Accept' +
+        '</button>' +
+        '<button type="button" class="btn-diff" onclick="diffProposal(\'' + id + '\')">' +
+          '&#9636; View Diff' +
+        '</button>' +
+        '<button type="button" class="btn-reject" onclick="rejectProposal(\'' + id + '\')">' +
+          '&#10005; Reject' +
+        '</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function acceptProposal(id) {
+  var card = document.getElementById('proposal-' + id);
+  if (!card) { return; }
+  var filePath = card.querySelector('.proposal-path').textContent;
+  var content  = proposalContents[id] || '';
+  card.querySelector('.btn-accept').disabled = true;
+  vscode.postMessage({ type: 'acceptFile', id: id, path: filePath, content: content });
+}
+
+function diffProposal(id) {
+  var card = document.getElementById('proposal-' + id);
+  if (!card) { return; }
+  var filePath = card.querySelector('.proposal-path').textContent;
+  var content  = proposalContents[id] || '';
+  vscode.postMessage({ type: 'viewDiff', id: id, path: filePath, content: content });
+}
+
+function rejectProposal(id) {
+  var card = document.getElementById('proposal-' + id);
+  if (!card) { return; }
+  delete proposalContents[id];
+  vscode.postMessage({ type: 'rejectFile', id: id });
+  // Update UI
+  var actionsEl = card.querySelector('.proposal-actions');
+  if (actionsEl) { actionsEl.remove(); }
+  var statusEl = document.createElement('div');
+  statusEl.className = 'proposal-status rejected';
+  statusEl.innerHTML = '&#10005; Rejected';
+  card.appendChild(statusEl);
+}
+
+// Inject proposal cards into a rendered HTML string
+function injectProposalCards(html, proposals) {
+  var result = html;
+  for (var i = 0; i < proposals.length; i++) {
+    var p        = proposals[i];
+    var marker   = escHtml('[[PROPOSAL:' + p.id + ']]');
+    var cardHtml = renderProposalCard(p.id, p.path, proposalContents[p.id] || '', true);
+    result = result.replace(marker, cardHtml);
+    // Also try unescaped version (renderMarkdown wraps in <span>)
+    result = result.replace('<span>[[PROPOSAL:' + p.id + ']]</span>', cardHtml);
+  }
+  return result;
+}
+
 // ── Markdown renderer ─────────────────────────────────────────────────────────
 
 function escHtml(s) {
@@ -603,7 +772,28 @@ function appendToken(token) {
 function finalizeAiMsg(sources) {
   if (!currentAiBubble) { return; }
   currentAiBubble.classList.remove('cursor');
-  currentAiBubble.innerHTML = renderMarkdown(streamingRawText);
+
+  // Phase 6: extract <file_write> proposals before rendering
+  var extracted = extractProposals(streamingRawText);
+
+  // Store proposal contents
+  for (var i = 0; i < extracted.proposals.length; i++) {
+    var p = extracted.proposals[i];
+    proposalContents[p.id] = p.content;
+  }
+
+  // Render markdown (proposals replaced with [[PROPOSAL:id]] markers)
+  var rendered = renderMarkdown(extracted.cleanedText);
+
+  // Inject proposal cards in place of markers
+  if (extracted.proposals.length > 0) {
+    rendered = injectProposalCards(rendered, extracted.proposals);
+    // Register with extension (for diff content provider)
+    vscode.postMessage({ type: 'registerProposals', proposals: extracted.proposals });
+  }
+
+  currentAiBubble.innerHTML = rendered;
+
   if (sources && sources.length) {
     var src = document.createElement('div');
     src.className = 'sources';
@@ -715,6 +905,33 @@ window.addEventListener('message', function(event) {
     case 'error':
       appendErrorMsg(msg.message);
       break;
+
+    case 'fileWritten': {
+      var card2 = document.getElementById('proposal-' + msg.id);
+      if (card2) {
+        var actions2 = card2.querySelector('.proposal-actions');
+        if (actions2) { actions2.remove(); }
+        var statusEl2 = document.createElement('div');
+        statusEl2.className = 'proposal-status accepted';
+        statusEl2.innerHTML = '&#10003; Accepted &mdash; <span style="font-family:Consolas,monospace">' + escHtml(msg.path) + '</span>';
+        card2.appendChild(statusEl2);
+        delete proposalContents[msg.id];
+      }
+      break;
+    }
+
+    case 'fileError': {
+      var card3 = document.getElementById('proposal-' + msg.id);
+      if (card3) {
+        var btn3 = card3.querySelector('.btn-accept');
+        if (btn3) { btn3.disabled = false; }
+        var statusEl3 = document.createElement('div');
+        statusEl3.className = 'proposal-status error';
+        statusEl3.textContent = 'Error: ' + msg.message;
+        card3.appendChild(statusEl3);
+      }
+      break;
+    }
   }
 });
 

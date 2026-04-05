@@ -1,24 +1,50 @@
 /**
  * ChatViewProvider — sidebar WebviewView for My AI Assistant.
- * Phase 5: adds @ file picker so users can attach workspace files as context.
+ * Phase 5: @ file picker for multi-file context.
+ * Phase 6: AI file proposals with Accept / Diff / Reject.
  */
 import * as vscode from 'vscode';
 import * as fs   from 'fs';
 import * as path from 'path';
 import { ApiClient, Source } from './ApiClient';
 
-type Message = { role: 'user' | 'assistant'; content: string };
+type Message   = { role: 'user' | 'assistant'; content: string };
 type FileEntry = { name: string; relPath: string; absPath: string; ext: string };
+
+// ── TextDocumentContentProvider for diff view ─────────────────────────────────
+
+class ProposedContentProvider implements vscode.TextDocumentContentProvider {
+    private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
+    readonly onDidChange  = this._onDidChange.event;
+    private _store        = new Map<string, string>(); // id → content
+
+    set(id: string, content: string): void    { this._store.set(id, content); }
+    delete(id: string): void                  { this._store.delete(id); }
+    has(id: string): boolean                  { return this._store.has(id); }
+
+    provideTextDocumentContent(uri: vscode.Uri): string {
+        // URI: myai-proposed://proposal/<id>
+        const id = uri.authority + uri.path.replace(/^\//, '');
+        return this._store.get(id) ?? '';
+    }
+
+    refresh(id: string): void {
+        this._onDidChange.fire(vscode.Uri.parse(`myai-proposed://${id}`));
+    }
+}
+
+// ── Main provider ─────────────────────────────────────────────────────────────
 
 export class ChatViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'myai.chatView';
 
-    private _view?: vscode.WebviewView;
-    private _client: ApiClient;
-    private _history: Message[] = [];
-    private _topic:   string    = '';
-    private _fileCtx: string    = '';
-    private _fileName: string   = '';
+    private _view?:            vscode.WebviewView;
+    private _client:           ApiClient;
+    private _history:          Message[] = [];
+    private _topic:            string    = '';
+    private _fileCtx:          string    = '';
+    private _fileName:         string    = '';
+    private _contentProvider:  ProposedContentProvider;
 
     constructor(private readonly _context: vscode.ExtensionContext) {
         const port = vscode.workspace.getConfiguration('myai').get<number>('serverPort', 8765);
@@ -27,10 +53,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         const defaultTopic = vscode.workspace.getConfiguration('myai').get<string>('defaultTopic', '');
         if (defaultTopic) { this._topic = defaultTopic; }
 
+        // Register the diff content provider
+        this._contentProvider = new ProposedContentProvider();
+        _context.subscriptions.push(
+            vscode.workspace.registerTextDocumentContentProvider('myai-proposed', this._contentProvider)
+        );
+
         vscode.window.onDidChangeActiveTextEditor(
             (ed: vscode.TextEditor | undefined) => this._syncFileContext(ed),
-            null,
-            this._context.subscriptions
+            null, _context.subscriptions
         );
 
         vscode.workspace.onDidChangeConfiguration(
@@ -41,8 +72,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     this._checkServer();
                 }
             },
-            null,
-            this._context.subscriptions
+            null, _context.subscriptions
         );
     }
 
@@ -64,14 +94,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(
             (msg) => this._handleWebviewMessage(msg),
-            null,
-            this._context.subscriptions
+            null, this._context.subscriptions
         );
 
         webviewView.onDidChangeVisibility(() => {
-            if (webviewView.visible) {
-                this._syncFileContext(vscode.window.activeTextEditor);
-            }
+            if (webviewView.visible) { this._syncFileContext(vscode.window.activeTextEditor); }
         });
     }
 
@@ -85,7 +112,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         }, 150);
     }
 
-    // ── Message handler ───────────────────────────────────────────────────────
+    // ── Message dispatcher ────────────────────────────────────────────────────
 
     private _handleWebviewMessage(msg: any): void {
         switch (msg.type) {
@@ -102,21 +129,89 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             case 'setTopic':
                 this._topic = msg.topic ?? '';
                 break;
+
+            // Phase 5 — @ file picker
             case 'getFiles':
                 this._getWorkspaceFiles().then(files => {
                     this._view?.webview.postMessage({ type: 'fileList', files });
                 });
                 break;
+
+            // Phase 6 — file proposals
+            case 'registerProposals':
+                for (const p of (msg.proposals ?? [])) {
+                    this._contentProvider.set(p.id, p.content);
+                }
+                break;
+            case 'acceptFile':
+                this._acceptFile(msg.id, msg.path, msg.content);
+                break;
+            case 'viewDiff':
+                this._showDiff(msg.id, msg.path, msg.content);
+                break;
+            case 'rejectFile':
+                this._contentProvider.delete(msg.id);
+                break;
         }
     }
 
-    // ── Workspace file scanner (for @ picker) ─────────────────────────────────
+    // ── Phase 6: file operations ──────────────────────────────────────────────
+
+    private _resolveAbsPath(relPath: string): string {
+        if (path.isAbsolute(relPath)) { return relPath; }
+        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
+        return path.join(root, relPath);
+    }
+
+    private async _acceptFile(id: string, relPath: string, content: string): Promise<void> {
+        const absPath = this._resolveAbsPath(relPath);
+        try {
+            const dir = path.dirname(absPath);
+            if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
+            fs.writeFileSync(absPath, content, 'utf8');
+            this._contentProvider.delete(id);
+
+            const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(absPath));
+            await vscode.window.showTextDocument(doc, { preview: false });
+
+            this._view?.webview.postMessage({ type: 'fileWritten', id, path: relPath });
+            vscode.window.showInformationMessage(`My AI: Saved ${relPath}`);
+        } catch (err: any) {
+            this._view?.webview.postMessage({ type: 'fileError', id, message: err.message });
+            vscode.window.showErrorMessage(`My AI: Could not write ${relPath}: ${err.message}`);
+        }
+    }
+
+    private async _showDiff(id: string, relPath: string, content: string): Promise<void> {
+        const absPath  = this._resolveAbsPath(relPath);
+        const fileName = path.basename(relPath);
+
+        this._contentProvider.set(id, content);
+        this._contentProvider.refresh(id);
+
+        const proposedUri = vscode.Uri.parse(`myai-proposed://${id}`);
+
+        if (fs.existsSync(absPath)) {
+            await vscode.commands.executeCommand(
+                'vscode.diff',
+                vscode.Uri.file(absPath),
+                proposedUri,
+                `${fileName}  \u2014  Current \u2194 AI Proposal`
+            );
+        } else {
+            // New file — just open the proposed content
+            const doc = await vscode.workspace.openTextDocument(proposedUri);
+            await vscode.window.showTextDocument(doc);
+        }
+    }
+
+    // ── Phase 5: workspace file scanner ──────────────────────────────────────
 
     private async _getWorkspaceFiles(): Promise<FileEntry[]> {
-        const excludes = '{**/node_modules/**,**/.git/**,**/dist/**,**/build/**,' +
-                         '**/.next/**,**/out/**,**/__pycache__/**,**/vendor/**,' +
-                         '**/.venv/**,**/coverage/**,**/*.vsix,**/*.lock}';
-
+        const excludes =
+            '{**/node_modules/**,**/.git/**,**/dist/**,**/build/**,' +
+            '**/.next/**,**/out/**,**/__pycache__/**,**/vendor/**,' +
+            '**/.venv/**,**/coverage/**,**/*.vsix,**/*.lock}';
         const uris = await vscode.workspace.findFiles('**/*', excludes, 1000);
         const root = (vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '').replace(/\\/g, '/');
 
@@ -132,38 +227,29 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             .sort((a, b) => a.relPath.localeCompare(b.relPath));
     }
 
-    // ── Chat sender ───────────────────────────────────────────────────────────
+    // ── Chat ──────────────────────────────────────────────────────────────────
 
     private _sendChat(question: string, attachedPaths: string[] = []): void {
         this._history.push({ role: 'user', content: question });
         this._view?.webview.postMessage({ type: 'startResponse' });
 
-        // Build file context: attached files first, then the active editor file
         let fileCtx = '';
         for (const p of attachedPaths) {
             try {
-                const content = fs.readFileSync(p, 'utf8');
-                const limit   = 15_000;
-                const body    = content.length > limit
-                    ? content.slice(0, limit) + '\n// ... [truncated]'
-                    : content;
-                const name    = p.split(/[\\/]/).pop() ?? p;
+                const text  = fs.readFileSync(p, 'utf8');
+                const limit = 15_000;
+                const body  = text.length > limit ? text.slice(0, limit) + '\n// ... [truncated]' : text;
+                const name  = p.split(/[\\/]/).pop() ?? p;
                 fileCtx += `\n\n--- Attached: ${name} ---\n${body}`;
-            } catch { /* skip unreadable files */ }
+            } catch { /* skip unreadable */ }
         }
         if (this._fileCtx) {
             fileCtx += `\n\n--- Active file: ${this._fileName || 'current'} ---\n${this._fileCtx}`;
         }
 
         let fullAnswer = '';
-
         this._client.streamChat(
-            {
-                question,
-                topic:        this._topic,
-                history:      this._history.slice(0, -1),
-                file_context: fileCtx,
-            },
+            { question, topic: this._topic, history: this._history.slice(0, -1), file_context: fileCtx },
             (token) => {
                 fullAnswer += token;
                 this._view?.webview.postMessage({ type: 'token', token });
@@ -172,9 +258,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 this._history.push({ role: 'assistant', content: fullAnswer });
                 this._view?.webview.postMessage({ type: 'done', sources });
             },
-            (err) => {
-                this._view?.webview.postMessage({ type: 'error', message: err });
-            }
+            (err) => { this._view?.webview.postMessage({ type: 'error', message: err }); }
         );
     }
 
@@ -188,9 +272,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         this._fileCtx  = text.length > limit ? text.slice(0, limit) + '\n// ... [truncated]' : text;
         this._fileName = doc.fileName.split(/[\\/]/).pop() ?? '';
         this._view?.webview.postMessage({
-            type:     'fileContext',
-            fileName: this._fileName,
-            chars:    this._fileCtx.length,
+            type: 'fileContext', fileName: this._fileName, chars: this._fileCtx.length,
         });
     }
 
@@ -198,18 +280,16 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         try {
             const h = await this._client.getHealth();
             this._view?.webview.postMessage({
-                type:    'serverStatus',
-                ok:      h.ok,
+                type: 'serverStatus', ok: h.ok,
                 message: h.ok
-                    ? `Connected  \u00b7  model: ${h.model}`
-                    : `Ollama not running  \u2014  run: ollama serve`,
+                    ? `Connected \u00b7 model: ${h.model}`
+                    : `Ollama not running \u2014 run: ollama serve`,
             });
             if (h.ok) { this._autoDetectProject(); }
         } catch {
             this._view?.webview.postMessage({
-                type:    'serverStatus',
-                ok:      false,
-                message: 'Backend not running  \u2014  run: myai serve',
+                type: 'serverStatus', ok: false,
+                message: 'Backend not running \u2014 run: myai serve',
             });
         }
     }
@@ -221,14 +301,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         const root = folders[0].uri.fsPath;
         try {
             const projects: any[] = await this._client.getProjects();
-            const match = projects.find((p) =>
-                root.startsWith(p.root) || p.root.startsWith(root)
-            );
+            const match = projects.find(p => root.startsWith(p.root) || p.root.startsWith(root));
             if (match) {
                 this._topic = match.topic;
                 this._view?.webview.postMessage({
-                    type:    'setTopic',
-                    topic:   match.topic,
+                    type: 'setTopic', topic: match.topic,
                     message: `Project detected: ${match.name}  (${match.framework})`,
                 });
             }
