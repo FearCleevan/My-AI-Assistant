@@ -348,10 +348,23 @@ def cmd_serve(args):
 
     try:
         import uvicorn
-        from api.server import app
-        uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
     except ImportError:
         print(_c(_RED, "✗  uvicorn not installed.  Run:  pip install uvicorn fastapi"))
+        sys.exit(1)
+
+    try:
+        from api.server import app
+    except Exception as e:
+        print(_c(_RED, f"✗  Failed to import server: {e}"))
+        import traceback; traceback.print_exc()
+        sys.exit(1)
+
+    try:
+        uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
+    except OSError as e:
+        print(_c(_RED, f"✗  Could not start server: {e}"))
+        if "10048" in str(e) or "address already in use" in str(e).lower():
+            print(_c(_GREY, f"   Port {port} is already in use. Try: myai serve --port 8766"))
         sys.exit(1)
     except KeyboardInterrupt:
         print(_c(_GREY, "\nServer stopped."))

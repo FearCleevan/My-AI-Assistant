@@ -33,6 +33,12 @@ body {
 #status-dot { width:8px; height:8px; border-radius:50%; background:#f38ba8; flex-shrink:0; }
 #status-dot.ok { background:#a6e3a1; }
 #status-text { color: var(--vscode-descriptionForeground, #6c7086); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#reconnect-btn {
+  background:none; border:1px solid #45475a; color:#6c7086;
+  border-radius:3px; padding:1px 7px; font-size:10px; cursor:pointer;
+  flex-shrink:0; display:none;
+}
+#reconnect-btn:hover { border-color:#89b4fa; color:#89b4fa; }
 
 /* ── Topic / file bar ───────────────────────────────────── */
 #context-bar {
@@ -324,6 +330,7 @@ body {
 <div id="status-bar">
   <div id="status-dot"></div>
   <span id="status-text">Connecting to My AI server&#8230;</span>
+  <button type="button" id="reconnect-btn" title="Retry connection">&#8635; Retry</button>
 </div>
 
 <div id="context-bar">
@@ -854,16 +861,24 @@ topicInput.addEventListener('change', function() {
 
 // ── Messages from extension ───────────────────────────────────────────────────
 
-var lastStatus = 'Connecting...';
+var lastStatus     = 'Connecting...';
+var reconnectBtn   = document.getElementById('reconnect-btn');
+
+reconnectBtn.addEventListener('click', function() {
+  statusText.textContent = 'Retrying\u2026';
+  reconnectBtn.style.display = 'none';
+  vscode.postMessage({ type: 'reconnect' });
+});
 
 window.addEventListener('message', function(event) {
   var msg = event.data;
   switch (msg.type) {
 
     case 'serverStatus':
-      statusDot.className   = 'status-dot' + (msg.ok ? ' ok' : '');
+      statusDot.className    = 'status-dot' + (msg.ok ? ' ok' : '');
       statusText.textContent = msg.message;
       lastStatus = msg.message;
+      reconnectBtn.style.display = msg.ok ? 'none' : 'inline-block';
       break;
 
     case 'fileContext':

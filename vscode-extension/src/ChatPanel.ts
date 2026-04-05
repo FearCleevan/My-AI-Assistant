@@ -45,6 +45,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     private _fileCtx:          string    = '';
     private _fileName:         string    = '';
     private _contentProvider:  ProposedContentProvider;
+    private _retryTimer?:      ReturnType<typeof setInterval>;
 
     constructor(private readonly _context: vscode.ExtensionContext) {
         const port = vscode.workspace.getConfiguration('myai').get<number>('serverPort', 8765);
@@ -128,6 +129,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                 break;
             case 'setTopic':
                 this._topic = msg.topic ?? '';
+                break;
+
+            case 'reconnect':
+                this._checkServer();
                 break;
 
             // Phase 5 — @ file picker
@@ -279,6 +284,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
     private async _checkServer(): Promise<void> {
         try {
             const h = await this._client.getHealth();
+            // Connected — clear any retry timer
+            if (this._retryTimer) {
+                clearInterval(this._retryTimer);
+                this._retryTimer = undefined;
+            }
             this._view?.webview.postMessage({
                 type: 'serverStatus', ok: h.ok,
                 message: h.ok
@@ -286,10 +296,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     : `Ollama not running \u2014 run: ollama serve`,
             });
             if (h.ok) { this._autoDetectProject(); }
-        } catch {
+        } catch (err: any) {
+            // Start auto-retry every 15 s so the panel reconnects automatically
+            if (!this._retryTimer) {
+                this._retryTimer = setInterval(() => this._checkServer(), 15_000);
+            }
+            const detail = err?.message ?? String(err);
             this._view?.webview.postMessage({
                 type: 'serverStatus', ok: false,
-                message: 'Backend not running \u2014 run: myai serve',
+                message: `Backend not running \u2014 run: myai serve  (${detail})`,
             });
         }
     }
