@@ -4,6 +4,33 @@
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Learn Tab</b></td>
+    <td align="center"><b>Chat Tab</b></td>
+    <td align="center"><b>Ask Tab</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/Screenshot%202026-04-08%20061710.png" alt="Learn Tab" width="320"/></td>
+    <td><img src="assets/Screenshot%202026-04-08%20061825.png" alt="Chat Tab" width="320"/></td>
+    <td><img src="assets/Screenshot%202026-04-08%20061924.png" alt="Ask Tab" width="320"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Topics Tab</b></td>
+    <td align="center"><b>Projects Tab</b></td>
+    <td align="center"><b>VS Code Extension</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/Screenshot%202026-04-08%20061759.png" alt="Topics Tab" width="320"/></td>
+    <td><img src="assets/Screenshot%202026-04-08%20061943.png" alt="Projects Tab" width="320"/></td>
+    <td><img src="assets/Screenshot%202026-04-08%20062050.png" alt="VS Code Extension Page" width="320"/></td>
+  </tr>
+</table>
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -179,6 +206,8 @@ Navigate between tabs with arrow keys. No mouse needed — ideal for SSH session
 A full sidebar chat panel that lives in the Activity Bar, identical in feel to GitHub Copilot or Claude Code.
 
 See [VS Code Extension Setup](#vs-code-extension-setup) for installation.
+
+![VS Code @ File Picker](assets/Screenshot%202026-04-08%20062109.png)
 
 **How to use the `@` file picker:**
 1. Type `@` in the chat input
