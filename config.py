@@ -8,7 +8,7 @@ _DEFAULTS = {
     "OLLAMA_BASE_URL":         "http://localhost:11434",
     "LLM_MODEL":               "llama3.2",
     "LLM_TEMPERATURE":         0.2,
-    "LLM_MAX_TOKENS":          1024,
+    "LLM_MAX_TOKENS":          4096,
     "EMBEDDING_MODEL":         "all-MiniLM-L6-v2",
     "CRAWLER_MAX_PAGES":       150,
     "CRAWLER_MAX_DEPTH":       3,

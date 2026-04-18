@@ -2,7 +2,7 @@
   "name": "myai-assistant",
   "displayName": "My AI Assistant",
   "description": "Your personal local AI assistant — powered by Ollama and your own knowledge base",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "fearcleevan",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["AI", "Chat", "Other"],

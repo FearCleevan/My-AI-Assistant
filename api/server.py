@@ -35,6 +35,30 @@ from pydantic import BaseModel
 
 app = FastAPI(title="My AI Agent API", version="2.0.0")
 
+
+@app.on_event("startup")
+async def _warmup():
+    """Pre-load embedding model and prime Ollama so the first user message is fast."""
+    def _run():
+        try:
+            from pipeline.embedder import embed_query
+            embed_query("warmup")
+        except Exception:
+            pass
+        try:
+            import requests as _req
+            _req.post(
+                f"{config.OLLAMA_BASE_URL}/api/generate",
+                json={"model": config.LLM_MODEL, "prompt": "", "stream": False},
+                timeout=60,
+            )
+        except Exception:
+            pass
+
+    import asyncio
+    asyncio.get_event_loop().run_in_executor(None, _run)
+
+
 # Allow the VS Code extension (running in a webview on a different origin) to call us
 app.add_middleware(
     CORSMiddleware,

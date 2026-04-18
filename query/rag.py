@@ -131,6 +131,8 @@ class RAGEngine:
             "You are a highly capable AI coding assistant with access to a private knowledge base.\n"
             "You can answer questions, explain concepts, generate complete working code (any length),\n"
             "debug issues, and reason step-by-step. Always be thorough and precise.\n"
+            "When reviewing code: point out SPECIFIC line-level issues, bugs, or improvements — "
+            "never give vague generic advice. Reference actual variable names, function names, and line numbers.\n"
         ]
 
         # RAG knowledge base context
@@ -143,18 +145,25 @@ class RAGEngine:
 
         # Attached file context
         if file_context.strip():
-            parts.append(
-                "=== ATTACHED FILE ===\n" + file_context.strip() + "\n=== END ATTACHED FILE ===\n\n"
-                "FILE OPERATION RULES: When your response requires creating or modifying a file, "
-                "output the COMPLETE file content wrapped in exactly this format:\n"
-                "<file_write path=\"relative/path/to/file.ext\">\n"
-                "... complete file content ...\n"
-                "</file_write>\n"
-                "Rules: (1) path must be relative to the workspace root, "
-                "(2) always include the FULL file content — never partial, "
-                "(3) you may include multiple <file_write> blocks if several files need changes, "
-                "(4) only use this format when actually writing or creating a file."
+            parts.append("=== ATTACHED FILE ===\n" + file_context.strip() + "\n=== END ATTACHED FILE ===\n")
+
+            write_keywords = (
+                "create", "write", "generate", "add", "implement", "refactor",
+                "fix", "update", "modify", "change", "edit", "rewrite", "make",
             )
+            q_lower = question.lower()
+            if any(kw in q_lower for kw in write_keywords):
+                parts.append(
+                    "FILE OPERATION RULES: When your response requires creating or modifying a file, "
+                    "output the COMPLETE file content wrapped in exactly this format:\n"
+                    "<file_write path=\"relative/path/to/file.ext\">\n"
+                    "... complete file content ...\n"
+                    "</file_write>\n"
+                    "Rules: (1) path must be relative to the workspace root, "
+                    "(2) always include the FULL file content — never partial, "
+                    "(3) you may include multiple <file_write> blocks if several files need changes, "
+                    "(4) only use this format when actually writing or creating a file."
+                )
 
         # Conversation history
         if history:
